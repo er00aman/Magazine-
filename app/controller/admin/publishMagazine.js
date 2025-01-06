@@ -5,7 +5,6 @@ import publisherModel from "../../model/admin/publisherMagazine.js";
 import HttpStatus from 'http-status-codes';
 
 
-
 export const publisherAccountCreate = async (req, res) => {
   try {
     if (req.files) {

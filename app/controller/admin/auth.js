@@ -69,25 +69,24 @@ export const login = async (req, res) => {
 
         const admin = adminData[0];
 
-        console.log("Admin data fetched from DB:", admin);
-        console.log("Plain password:", password);
-        console.log("Hashed password from DB:", admin.password);
-
+        // Check password
         const checkPassword = await comparePass(password, admin.password);
         if (!checkPassword) {
             return sendErrorResponse(res, errorEn.PASS_NOT_MATCHED, HttpStatus.NOT_FOUND);
         }
 
-        const tokenResponse = generateToken({ email: admin.email, _id: admin._id }, "24h");
+        // Generate token with 30 minutes expiration
+        const tokenResponse = generateToken({ email: admin.email, _id: admin._id }, "30m");
         if (tokenResponse.status === 0) {
             return sendErrorResponse(res, tokenResponse.error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         const token = tokenResponse.token;
 
+        // Set the token in cookies
         res.cookie("accessToken", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production", 
-            maxAge: 24 * 60 * 60 * 1000, 
+            maxAge: 30 * 60 * 1000,
         });
 
         const saveData = {
@@ -181,7 +180,7 @@ export const resetPassword = async (req, res) => {
             sendErrorResponse(res, errorEn.INVALID_FIELD, HttpStatus.BAD_REQUEST)
         }
 
-        console.log(req.body);
+        // console.log(req.body);
 
         const checkAdminEmail = await AdminModel.findOne({ email: email });
         
@@ -199,14 +198,14 @@ export const resetPassword = async (req, res) => {
         checkAdminEmail.resetOTP = undefined;  
         await checkAdminEmail.save();
 
-        console.log("Password Reset Success Data:", checkAdminEmail.email); 
+        // console.log("Password Reset Success Data:", checkAdminEmail.email); 
 
         const responseData = {
             email: checkAdminEmail.email,
             message: successEn.PASSWORD_RESET
         };
 
-        console.log("Response Data:", responseData); 
+        // console.log("Response Data:", responseData); 
 
         return sendSuccessResponse(res, responseData, successEn.PASSWORD_RESET, HttpStatus.OK);
 
