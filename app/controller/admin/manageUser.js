@@ -7,56 +7,54 @@ import { successEn, errorEn } from '../../responses/message.js';
 
 
 export const createUser = async (req, res) => {
-    try {
-      let language = req.headers.language;
-      if (language == undefined || language == '' || language == null) {
-        language = 'en';
-      }
-  
-      let { userName, email, password, phoneNumber, deviceToken, longitude, latitude, createdAt, updatedAt } = req.body;
-  
-      if (!userName || !email || !password || !phoneNumber || !longitude || !latitude) {
-        return sendErrorResponse(res, errorEn.INVALID_FIELD, HttpStatus.BAD_REQUEST);
-      }
-  
-      const lowerCaseEmail = email.toLowerCase();
-      const exitUser = await UserModel.findOne({ email: lowerCaseEmail });
-      if (exitUser) {
-        return sendErrorResponse(res, errorEn.ALREADY_EXIST, HttpStatus.DEFAULT_ERROR);
-      }
-  
-      password = await genPassword(password);
-  
-      const location = {
-        type: "Point",
-        coordinates: [longitude, latitude],
-      };
-  
-      const dataToSave = {
-        userName: userName,
-        email: lowerCaseEmail,
-        password: password,
-        phoneNumber: phoneNumber,
-        deviceToken: deviceToken,
-        location: location,
-        isDeleted: false, 
-        createdAt: createdAt ? new Date(createdAt) : Date.now(), 
-        updatedAt: updatedAt ? new Date(updatedAt) : Date.now(),
-      };
-  
-      const data = await commonService.create(UserModel, dataToSave);
-      if (data) {
-        const responseData = {
-          ...data.toObject(), 
-          isDeleted: data.isDeleted,  
-        };
-        sendSuccessResponse(res, responseData, successEn.USER_CREATED, HttpStatus.OK);
-      } else {
-        sendErrorResponse(res, errorEn.DEFAULT_ERROR, HttpStatus.DEFAULT_ERROR);
-      }
-    } catch (error) {
-      return sendErrorResponse(res, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+  try {
+    // Handle language from headers or default to 'en'
+    let language = req.headers.language || 'en';
+
+    // Extract data from request body
+    const { userName, email, password, phoneNumber } = req.body;
+
+    // Validate required fields
+    if (!userName || !email || !password || !phoneNumber) {
+      return sendErrorResponse(res, errorEn.INVALID_FIELD, HttpStatus.BAD_REQUEST);
     }
+
+    // Normalize email to lowercase
+    const lowerCaseEmail = email.toLowerCase();
+
+    // Check for existing user
+    const existingUser = await UserModel.findOne({ email: lowerCaseEmail });
+    if (existingUser) {
+      return sendErrorResponse(res, errorEn.ALREADY_EXIST, HttpStatus.CONFLICT);
+    }
+
+    // Hash the password
+    const hashedPassword = await genPassword(password);
+
+    // Prepare data for saving
+    const dataToSave = {
+      userName,
+      email: lowerCaseEmail,
+      password: hashedPassword,
+      phoneNumber,
+    };
+
+    // Save the user to the database
+    const data = await commonService.create(UserModel, dataToSave);
+
+    if (data) {
+      // Remove sensitive fields from response
+      const { password, ...responseData } = data.toObject();
+      return sendSuccessResponse(res, responseData, successEn.USER_CREATED, HttpStatus.CREATED);
+    }
+
+    // Default error response
+    return sendErrorResponse(res, errorEn.DEFAULT_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+
+  } catch (error) {
+    // Catch unexpected errors
+    return sendErrorResponse(res, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+  }
 };
 
 
@@ -78,6 +76,7 @@ export const getAll = async(req,res)=>{
 export const updateUser = async (req, res) => {
     try {
       const { _id, userName, email, phoneNumber, createdAt, updatedAt } = req.body;
+      console.log(req.body)
   
       if (!_id) {
         return sendErrorResponse(res, errorEn.INVALID_FIELD, HttpStatus.BAD_REQUEST);

@@ -42,10 +42,6 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    location: {
-      type: { type: String, default: "Point" },
-      coordinates: [Number],
-    },
     accessToken: {
       type: String,
       default: null,

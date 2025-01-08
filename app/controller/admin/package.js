@@ -8,6 +8,7 @@ import * as commonService from '../../services/common.js'
 export const createPackage = async (req, res) => {
     try {
         const { name, price, features, duration } = req.body;
+        console.log(req.body)
         
         if (!name || !price || !features || !duration) {
             return sendErrorResponse(res, errorEn.INVALID_FIELD, HttpStatus.INVALID_FIELD);

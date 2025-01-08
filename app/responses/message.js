@@ -17,12 +17,7 @@ export const successEn = {
     OTP_VERIFIED : 'OTP verified.',
     OTP_RESEND : 'OTP Resent Successfully.',
     LOGOUT:'Logout Successfully',
-    SALESMAN_LOGIN_SUCCESS : 'SalesMan login successfully.',
-    DELIVERY_LOGIN_SUCCESS : 'Delivery boy login successfully.',
     DETAILS_FETCH : 'Details fetched successfully.',
-    CATEGORY_CREATE : 'Category created successful',
-    SUB_CATEGORY_CREATE:'Sub category created successful',
-    PRODUCT_ADDED:'Product added successfully',
     ORDER_CREATED:'Order created successfully',
     USER_DELETED:'User deleted successfully'
 

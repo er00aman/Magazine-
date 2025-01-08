@@ -19,7 +19,7 @@ dotenv.config();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: process.env.CORS_ORIGIN }));
+app.use(cors({ origin:'*'}));
 
 // Connect to the database
 connectDb();
@@ -29,6 +29,12 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Use routes (No changes here)
 app.use('/apis', indexRouter);
+
+app.get("/",(req,res)=>{
+    res.json({
+        message:"Server is running at 8000"
+    })
+})
 
 // Start the server
 const PORT = process.env.PORT || 8000;

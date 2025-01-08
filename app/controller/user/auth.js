@@ -52,3 +52,18 @@ export const createAccount = async (req, res) => {
         return sendErrorResponse(res, error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 };
+
+
+export const getAll = async(req,res)=>{
+    try{
+        const data = await UserModel.find()
+        if(data){
+            return sendSuccessResponse(res,successEn.DETAILS_FETCH,HttpStatus.OK)
+        }else{
+            return sendErrorResponse(res,errorEn.NOT_FOUND,HttpStatus.NOT_FOUND)
+        }
+    }catch(error){
+        console.log(error.message)
+        return sendErrorResponse(res, error.message,HttpStatus.DEFAULT_ERROR)
+    }
+}

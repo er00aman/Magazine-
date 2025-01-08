@@ -15,8 +15,8 @@ import * as home from '../../controller/admin/home.js'
 
 // Manage user routes
 router.route("/create").post(manageUser.createUser);
-router.route("/getAll").get(manageUser.getAll);
-router.route("/updateUser").post(verifyAdminToken, manageUser.updateUser);
+router.route("/getAll").get(verifyAdminToken,manageUser.getAll);
+router.route("/updateUser").put(verifyAdminToken, manageUser.updateUser);
 router.route("/delete").post(verifyAdminToken, manageUser.deleteUser);
 
 // Publisher Account Routes
@@ -47,7 +47,7 @@ router.route("/deletePublisherAccount").post(
 router.route("/createPackages").post(verifyAdminToken,packages.createPackage)
 router.route("/getAllPackages").get(verifyAdminToken,packages.getAll)
 router.route("/updatePackages").put(
-    verifyAdminToken,
+    verifyAdminToken, 
     packages.updatePackages)
 router.route("/deletePackages").post(verifyAdminToken,packages.deletePackages)
 
